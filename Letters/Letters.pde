@@ -4,13 +4,15 @@ var Vec2D = toxi.geom.Vec2D,
 var LETTER_WIDTH = 20;
 var LETTER_HEIGHT = 25;
 var CIRCLE_RADIUS = 7;
-float THRESHOLD = 1;
+float THRESHOLD = 3;
 
 Letter a, currentLetter;
 float currentScale;
 Vec2D mouseXY;
+boolean requireMousePressedInCircleToContinue = false;
 
 void setup() {
+  size(400,400); // supress IDE warnings
   size(window.innerWidth, window.innerHeight);
   frameRate(30);
     
@@ -114,13 +116,15 @@ class Letter {
     boolean insideCircle = false;
     if(delta <= CIRCLE_RADIUS*currentScale && mousePressed){
       insideCircle = true;
+      requireMousePressedInCircleToContinue = false;
     }
-    if(mousePressed && insideCircle){
-      float err = currentLetter.currentPath.closestPointTo(mouseXY).distanceTo(mouseXY);
+    if(mousePressed && (insideCircle || !requireMousePressedInCircleToContinue)){
+      Vec2D closestPoint = currentLetter.currentPath.closestPointTo(mouseXY);
+      float err = closestPoint.distanceTo(mouseXY);
       if(err <= THRESHOLD*currentScale){
         // moving towards target? (IE this move makes them closer to the target)
         if(mouseXY.distanceTo(target) < currentCircleXY.distanceTo(target)){
-          currentCircleXY = mouseXY;
+          currentCircleXY = closestPoint; // always show circle on path
         }
       }
     }
@@ -155,6 +159,10 @@ class Letter {
     ellipseMode(CENTER);
     ellipse(currentCircleXY.x, currentCircleXY.y, CIRCLE_RADIUS*currentScale, CIRCLE_RADIUS*currentScale);
   }
+}
+
+void mouseReleased() {
+  requireMousePressedInCircleToContinue = true;
 }
 
 void createShapes() {
