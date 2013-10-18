@@ -167,8 +167,9 @@ void mouseReleased() {
 
 void createShapes() {
   a = new Letter(new Point[]{
-  new Point(0,LETTER_HEIGHT),
   new Point(LETTER_WIDTH/2, 0),
+  new Point(0,LETTER_HEIGHT),
+  new Point(LETTER_WIDTH/2, 0, true),
   new Point(LETTER_WIDTH, LETTER_HEIGHT),
   new Point(LETTER_WIDTH*0.7, LETTER_HEIGHT*0.4, true),
   new Point(LETTER_WIDTH*0.3, LETTER_HEIGHT*0.4)
