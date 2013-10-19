@@ -36,7 +36,8 @@ void draw() {
   mouseXY = new Vec2D(mouseX, mouseY);
   currentScale = min(width/LETTER_WIDTH * 0.5, height/LETTER_HEIGHT * 0.5);
 
-  background(232,35,176);
+//  background(232,35,176);
+  background(255);
   
   pushMatrix();
   translate(width/2, height/2);
@@ -65,6 +66,14 @@ void createShapes() {
   new Vertex(LETTER_WIDTH*0.3, LETTER_HEIGHT*0.4)
   });
 }
+
+    //236  170  216  
+   //   247  205  180  
+   //241  184  244  
+   //198  150  247  
+   //220  251  179  
+   //193  251  236  
+   //
 
 class Vertex {
   Vec2D pos;
@@ -103,7 +112,7 @@ class Letter {
   void drawIt() {
     noFill();
     shapeMode(CORNER);
-    stroke(100, 100);
+    stroke(241,184,244,100);
     strokeWeight(1);
     
     beginShape();
@@ -175,13 +184,13 @@ class Letter {
     }
 
     /* draw current circle */
-    strokeWeight(currentScale);  
+    //strokeWeight(currentScale);
+    noStroke();  
     if(insideCircle){
-      stroke(0);
+      fill(236,170,216,200);
     }else{
-      noStroke();
+      fill(193,251,232,200);
     }
-    fill(100);
     ellipseMode(CENTER);
     ellipse(currentCircleXY.x, currentCircleXY.y, CIRCLE_RADIUS*currentScale, CIRCLE_RADIUS*currentScale);
   }

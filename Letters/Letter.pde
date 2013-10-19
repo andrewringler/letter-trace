@@ -1,3 +1,11 @@
+    //236  170  216  
+   //   247  205  180  
+   //241  184  244  
+   //198  150  247  
+   //220  251  179  
+   //193  251  236  
+   //
+
 class Vertex {
   Vec2D pos;
   boolean newStroke;
@@ -35,7 +43,7 @@ class Letter {
   void drawIt() {
     noFill();
     shapeMode(CORNER);
-    stroke(100, 100);
+    stroke(241,184,244,100);
     strokeWeight(1);
     
     beginShape();
@@ -107,13 +115,13 @@ class Letter {
     }
 
     /* draw current circle */
-    strokeWeight(currentScale);  
+    //strokeWeight(currentScale);
+    noStroke();  
     if(insideCircle){
-      stroke(0);
+      fill(236,170,216,200);
     }else{
-      noStroke();
+      fill(193,251,232,200);
     }
-    fill(100);
     ellipseMode(CENTER);
     ellipse(currentCircleXY.x, currentCircleXY.y, CIRCLE_RADIUS*currentScale, CIRCLE_RADIUS*currentScale);
   }

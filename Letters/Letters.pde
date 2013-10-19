@@ -36,7 +36,8 @@ void draw() {
   mouseXY = new Vec2D(mouseX, mouseY);
   currentScale = min(width/LETTER_WIDTH * 0.5, height/LETTER_HEIGHT * 0.5);
 
-  background(232,35,176);
+//  background(232,35,176);
+  background(255);
   
   pushMatrix();
   translate(width/2, height/2);
