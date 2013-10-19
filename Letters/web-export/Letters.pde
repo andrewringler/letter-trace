@@ -1,3 +1,6 @@
+Maxim maxim;
+AudioPlayer player;
+
 var Vec2D = toxi.geom.Vec2D,
     Line2D = toxi.geom.Line2D;
 
@@ -16,6 +19,10 @@ void setup() {
   size(window.innerWidth, window.innerHeight);
   frameRate(30);
     
+  maxim = new Maxim(this);
+  player = maxim.loadFile("pencil.wav");
+  player.setLooping(true);
+
   createShapes();
   currentLetter = a;
 }
@@ -45,6 +52,7 @@ void draw() {
 
 void mouseReleased() {
   requireMousePressedInCircleToContinue = true;
+  player.stop();
 }
 
 void createShapes() {
@@ -121,6 +129,7 @@ class Letter {
   void trace() {
     if(done){
       return;
+      player.stop();
     }
     
     /* update circle location based on user press
@@ -132,8 +141,10 @@ class Letter {
     if(delta <= CIRCLE_RADIUS*currentScale && mousePressed){
       insideCircle = true;
       requireMousePressedInCircleToContinue = false;
+      player.play();
     }
     if(mousePressed && (insideCircle || !requireMousePressedInCircleToContinue)){
+      player.play();
       Vec2D closestPoint = currentLetter.currentPath.closestPointTo(mouseXY);
       float err = closestPoint.distanceTo(mouseXY);
       if(err <= THRESHOLD*currentScale){

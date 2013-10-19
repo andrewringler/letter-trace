@@ -1,3 +1,6 @@
+Maxim maxim;
+AudioPlayer player;
+
 var Vec2D = toxi.geom.Vec2D,
     Line2D = toxi.geom.Line2D;
 
@@ -16,6 +19,10 @@ void setup() {
   size(window.innerWidth, window.innerHeight);
   frameRate(30);
     
+  maxim = new Maxim(this);
+  player = maxim.loadFile("pencil.wav");
+  player.setLooping(true);
+
   createShapes();
   currentLetter = a;
 }
@@ -45,6 +52,7 @@ void draw() {
 
 void mouseReleased() {
   requireMousePressedInCircleToContinue = true;
+  player.stop();
 }
 
 void createShapes() {
