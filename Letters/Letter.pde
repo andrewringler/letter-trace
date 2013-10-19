@@ -68,8 +68,8 @@ class Letter {
   
   void trace() {
     if(done){
-      return;
       player.stop();
+      return;
     }
     
     /* update circle location based on user press
@@ -97,12 +97,12 @@ class Letter {
     
     /* have the reached the current target?
      or the final target for this letter? */
-    if(currentCircleXY.distanceTo(target) <= THRESHOLD*currentScale){
+    if(currentCircleXY.distanceTo(target) <= THRESHOLD*currentScale) {
       int nextState = state+1;
       if(nextState == points.length){
         done = true;
-      }else{
-        if(nextState+1 <points.length && points[nextState+1].newStroke){
+      } else {
+        if(nextState+1 <points.length && points[nextState+1].newStroke) {
           nextState++;
         }
         state = nextState;
@@ -110,7 +110,7 @@ class Letter {
       }
     }
     
-    if(done){
+    if(done) {
       return;
     }
 
@@ -123,6 +123,6 @@ class Letter {
       fill(193,251,232,200);
     }
     ellipseMode(CENTER);
-    ellipse(currentCircleXY.x, currentCircleXY.y, CIRCLE_RADIUS*currentScale, CIRCLE_RADIUS*currentScale);
+    ellipse(currentCircleXY.x, currentCircleXY.y, CIRCLE_RADIUS*currentScale, CIRCLE_RADIUS*currentScale);    
   }
 }

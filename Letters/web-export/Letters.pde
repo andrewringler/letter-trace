@@ -9,7 +9,8 @@ var LETTER_HEIGHT = 25;
 var CIRCLE_RADIUS = 7;
 float THRESHOLD = 3;
 
-Letter a, currentLetter;
+Letter[] letters, currentLetter;
+int currentLetterIndex = 0;
 float currentScale;
 Vec2D mouseXY;
 boolean requireMousePressedInCircleToContinue = false;
@@ -24,10 +25,17 @@ void setup() {
   player.setLooping(true);
 
   createShapes();
-  currentLetter = a;
+  currentLetter = letters[currentLetterIndex];
 }
 
 void draw() {
+  if(currentLetter.done && (currentLetterIndex+1) < letters.length){
+    currentLetterIndex++;
+    currentLetter = letters[currentLetterIndex];
+    nextState = 0;
+    done = false;
+  }
+
   var newWidth = window.innerWidth;
   var newHeight = int(window.innerHeight);
   if(newWidth != width || newHeight != height){
@@ -57,14 +65,29 @@ void mouseReleased() {
 }
 
 void createShapes() {
-  a = new Letter(new Vertex[]{
+  letters = new Letters[] {
+    
+  new Letter(new Vertex[]{
   new Vertex(LETTER_WIDTH/2, 0),
   new Vertex(0,LETTER_HEIGHT),
   new Vertex(LETTER_WIDTH/2, 0, true),
   new Vertex(LETTER_WIDTH, LETTER_HEIGHT),
   new Vertex(LETTER_WIDTH*0.7, LETTER_HEIGHT*0.4, true),
   new Vertex(LETTER_WIDTH*0.3, LETTER_HEIGHT*0.4)
-  });
+  }),
+  
+  new Letter(new Vertex[]{
+  new Vertex(0,0),
+  new Vertex(0, LETTER_HEIGHT),
+  new Vertex(LETTER_WIDTH, 0, true),
+  new Vertex(0, 0),
+  new Vertex(LETTER_WIDTH*0.7, LETTER_HEIGHT*0.4, true),
+  new Vertex(0, LETTER_HEIGHT*0.4),
+  new Vertex(LETTER_WIDTH, LETTER_HEIGHT, true),
+  new Vertex(0, LETTER_HEIGHT)
+  })
+  
+  };
 }
 
     //236  170  216  
@@ -137,8 +160,8 @@ class Letter {
   
   void trace() {
     if(done){
-      return;
       player.stop();
+      return;
     }
     
     /* update circle location based on user press
@@ -166,12 +189,12 @@ class Letter {
     
     /* have the reached the current target?
      or the final target for this letter? */
-    if(currentCircleXY.distanceTo(target) <= THRESHOLD*currentScale){
+    if(currentCircleXY.distanceTo(target) <= THRESHOLD*currentScale) {
       int nextState = state+1;
       if(nextState == points.length){
         done = true;
-      }else{
-        if(nextState+1 <points.length && points[nextState+1].newStroke){
+      } else {
+        if(nextState+1 <points.length && points[nextState+1].newStroke) {
           nextState++;
         }
         state = nextState;
@@ -179,7 +202,7 @@ class Letter {
       }
     }
     
-    if(done){
+    if(done) {
       return;
     }
 
@@ -192,7 +215,7 @@ class Letter {
       fill(193,251,232,200);
     }
     ellipseMode(CENTER);
-    ellipse(currentCircleXY.x, currentCircleXY.y, CIRCLE_RADIUS*currentScale, CIRCLE_RADIUS*currentScale);
+    ellipse(currentCircleXY.x, currentCircleXY.y, CIRCLE_RADIUS*currentScale, CIRCLE_RADIUS*currentScale);    
   }
 }
 
