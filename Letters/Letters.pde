@@ -1,7 +1,5 @@
 Maxim maxim;
-AudioPlayer player;
-
-var Vec2D = toxi.geom.Vec2D,
+AudioPlayer player;var Vec2D = toxi.geom.Vec2D,
     Line2D = toxi.geom.Line2D;
 
 var LETTER_WIDTH = 20;
@@ -22,6 +20,7 @@ void setup() {
     
   maxim = new Maxim(this);
   player = maxim.loadFile("pencil.wav");
+  player.volume(0.4);
   player.setLooping(true);
 
   createShapes();
@@ -62,6 +61,7 @@ void draw() {
 void mouseReleased() {
   requireMousePressedInCircleToContinue = true;
   player.stop();
+  player.cue(0);
 }
 
 void createShapes() {

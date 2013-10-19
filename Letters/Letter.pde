@@ -76,15 +76,24 @@ class Letter {
     if they are following the current path
     towards the target
     */
+    float speed = dist(mouseX, mouseY, pmouseX, pmouseY);
     float delta = mouseXY.distanceTo(currentCircleXY);
     boolean insideCircle = false;
     if(delta <= CIRCLE_RADIUS*currentScale && mousePressed){
       insideCircle = true;
       requireMousePressedInCircleToContinue = false;
-      player.play();
+      if(speed > 1){
+        player.play();
+      }else{
+        player.stop();
+      }
     }
     if(mousePressed && (insideCircle || !requireMousePressedInCircleToContinue)){
-      player.play();
+      if(speed > 1){
+        player.play();
+      }else{
+        player.stop();
+      }
       Vec2D closestPoint = currentLetter.currentPath.closestPointTo(mouseXY);
       float err = closestPoint.distanceTo(mouseXY);
       if(err <= THRESHOLD*currentScale){
