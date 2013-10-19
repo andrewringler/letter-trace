@@ -83,14 +83,14 @@ class Letter {
       insideCircle = true;
       requireMousePressedInCircleToContinue = false;
       if(speed > 1){
-        player.play();
+//        player.play();
       }else{
         player.stop();
       }
     }
     if(mousePressed && (insideCircle || !requireMousePressedInCircleToContinue)){
       if(speed > 1){
-        player.play();
+//        player.play();
       }else{
         player.stop();
       }

@@ -124,7 +124,6 @@ void createShapes() {
 
   };
 }
-
     //236  170  216  
    //   247  205  180  
    //241  184  244  
@@ -210,14 +209,14 @@ class Letter {
       insideCircle = true;
       requireMousePressedInCircleToContinue = false;
       if(speed > 1){
-        player.play();
+//        player.play();
       }else{
         player.stop();
       }
     }
     if(mousePressed && (insideCircle || !requireMousePressedInCircleToContinue)){
       if(speed > 1){
-        player.play();
+//        player.play();
       }else{
         player.stop();
       }
