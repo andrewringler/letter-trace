@@ -10,9 +10,7 @@ float THRESHOLD = 3;
 
 Letter[] letters, currentLetter;
 int currentLetterIndex = 0;
-float currentScale;
-Vec2D mouseXY, mouseModelVec2D;
-boolean requireMousePressedInCircleToContinue = false;
+Tracing tracing;
 
 void setup() {
   size(400,400); // supress IDE warnings
@@ -26,6 +24,7 @@ void setup() {
 
   createShapes();
   currentLetter = letters[currentLetterIndex];
+  tracing = new Tracing(currentLetter);
   
   stretch = new Stretch(LETTER_WIDTH, LETTER_HEIGHT, 0.5);
 }
@@ -33,23 +32,22 @@ void setup() {
 void draw() {
   stretch.update();
   
-  if(currentLetter.done && (currentLetterIndex+1) < letters.length){
+  if(tracing.done() && (currentLetterIndex+1) < letters.length){
     currentLetterIndex++;
     currentLetter = letters[currentLetterIndex];
-    nextState = 0;
-    done = false;
+    tracing = new Tracing(currentLetter);
   }
 
-//  background(232,35,176);
   background(255);
     
-  currentLetter.drawIt();
-  currentLetter.trace();  
+  currentLetter.update(tracing.state);
+  tracing.update();  
 }
 
 void mouseReleased() {
-  requireMousePressedInCircleToContinue = true;
-  player.stop();
-  player.cue(0);
+  tracing.handleMouseReleased();
 }
 
+void mousePressed() {
+  tracing.handleMousePressed();
+}

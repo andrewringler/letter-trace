@@ -10,9 +10,7 @@ float THRESHOLD = 3;
 
 Letter[] letters, currentLetter;
 int currentLetterIndex = 0;
-float currentScale;
-Vec2D mouseXY, mouseModelVec2D;
-boolean requireMousePressedInCircleToContinue = false;
+Tracing tracing;
 
 void setup() {
   size(400,400); // supress IDE warnings
@@ -26,6 +24,7 @@ void setup() {
 
   createShapes();
   currentLetter = letters[currentLetterIndex];
+  tracing = new Tracing(currentLetter);
   
   stretch = new Stretch(LETTER_WIDTH, LETTER_HEIGHT, 0.5);
 }
@@ -33,26 +32,25 @@ void setup() {
 void draw() {
   stretch.update();
   
-  if(currentLetter.done && (currentLetterIndex+1) < letters.length){
+  if(tracing.done() && (currentLetterIndex+1) < letters.length){
     currentLetterIndex++;
     currentLetter = letters[currentLetterIndex];
-    nextState = 0;
-    done = false;
+    tracing = new Tracing(currentLetter);
   }
 
-//  background(232,35,176);
   background(255);
     
-  currentLetter.drawIt();
-  currentLetter.trace();  
+  currentLetter.update(tracing.state);
+  tracing.update();  
 }
 
 void mouseReleased() {
-  requireMousePressedInCircleToContinue = true;
-  player.stop();
-  player.cue(0);
+  tracing.handleMouseReleased();
 }
 
+void mousePressed() {
+  tracing.handleMousePressed();
+}
 void createShapes() {
   letters = new Letters[] {
     
@@ -120,7 +118,6 @@ void createShapes() {
    //220  251  179  
    //193  251  236  
    //
-
 class Vertex {
   Vec2D pos;
   boolean newStroke;
@@ -140,22 +137,12 @@ class Vertex {
 
 class Letter {
   Vertex[] points;
-  int state = 0;
-  Line2D currentPath;
-  Vec2D currentCircleXY = new Vec2D(0,0);
-  boolean drawNext = true;
-  Vec2D target;
-  boolean done = false;
   
   Letter(Vertex[] points){
     this.points = points;
   }
   
-  Vec2D currentCircle() {
-   return points[state];
-  } 
-  
-  void drawIt() {
+  void update(int state) {
     noFill();
     shapeMode(CORNER);
     stroke(241,184,244,100);
@@ -168,85 +155,91 @@ class Letter {
         beginShape();
       }
       vertex(points[i].x, points[i].y);
-      if(i == state && drawNext){
-        currentCircleXY = points[i].pos;
-        drawNext = false;
-        
-        if(i<points.length-1){
-          currentPath = new Line2D(points[i].pos, points[i+1].pos);
-          target = points[i+1];
-        }
-      }
     } 
     endShape();      
   }
+}
+
+class Tracing {
+  Letter l;
+  Vec2D userPos;     
+  Line2D currentPath;
+  int state = 0;
+  boolean tracing = false;
   
-  void trace() {
-    if(done){
-      player.stop();
-      return;
+  Tracing(Letter letter) {
+    this.l = letter;
+    userPos = l.points[state].pos;
+    currentPath = new Line2D(userPos, l.points[state+1].pos);
+  }
+  
+  void handleMousePressed() {
+    if(!done() && !tracing){
+      // maybe this is the start of a new trace
+      float delta = stretch.mouse.distanceTo(userPos);
+      if(delta <= CIRCLE_RADIUS){
+        tracing = true;
+      }
     }
-    
+  }
+  
+  void handleMouseReleased() {
+    if(tracing) {
+      // reset to start of current path
+      userPos = l.points[state].pos;
+      tracing = false;
+    }
+  }
+  
+  void target() {
+    return currentPath.b;
+  }
+  
+  void done() {
+    return state >= (l.points.length-1);
+  }
+  
+  void update() {
     /* update circle location based on user press
-    if they are following the current path
-    towards the target
+    only if they are actually following the correct
+    current path in the direction of the target
     */
-    float speed = dist(mouseX, mouseY, pmouseX, pmouseY);
-    float delta = stretch.mouse.distanceTo(currentCircle());
-    boolean insideCircle = false;
-    if(delta <= CIRCLE_RADIUS && mousePressed){
-      insideCircle = true;
-      requireMousePressedInCircleToContinue = false;
-      if(speed > 1){
-//        player.play();
-      }else{
-        player.stop();
-      }
-    }
-    if(mousePressed && (insideCircle || !requireMousePressedInCircleToContinue)){
-      if(speed > 1){
-//        player.play();
-      }else{
-        player.stop();
-      }
-      Vec2D closestPoint = currentLetter.currentPath.closestPointTo(stretch.mouse);
+    if(tracing){
+      float delta = stretch.mouse.distanceTo(userPos);
+      Vec2D closestPoint = currentPath.closestPointTo(stretch.mouse);
       float err = closestPoint.distanceTo(stretch.mouse);
       if(err <= THRESHOLD){
         // moving towards target? (IE this move makes them closer to the target)
-        if(stretch.mouse.distanceTo(target) < currentCircleXY.distanceTo(target)){
-          currentCircleXY = closestPoint; // always show circle on path
+        if(stretch.mouse.distanceTo(target()) < userPos.distanceTo(target())){
+          userPos = closestPoint;
         }
       }
     }
     
-    /* have the reached the current target?
-     or the final target for this letter? */
-    if(currentCircleXY.distanceTo(target) <= THRESHOLD) {
-      int nextState = state+1;
-      if(nextState == points.length){
-        done = true;
-      } else {
-        if(nextState+1 <points.length && points[nextState+1].newStroke) {
-          nextState++;
-        }
-        state = nextState;
-        drawNext = true;
+    if(tracing && userPos.distanceTo(target()) <= THRESHOLD) {
+      // they have reached the current target, move on to the next path
+      state++;
+      if(state+1 < l.points.length && l.points[state+1].newStroke){
+        state++;
+      }
+      tracing = false;
+      if(!done()){
+        userPos = l.points[state].pos;
+        currentPath = new Line2D(userPos, l.points[state+1].pos);
       }
     }
     
-    if(done) {
-      return;
-    }
-
     /* draw current circle */
-    noStroke();  
-    if(insideCircle){
-      fill(236,170,216,200);
-    }else{
-      fill(193,251,232,200);
+    if(!done()){
+      noStroke();  
+      if(tracing){
+        fill(236,170,216,200);
+      }else{
+        fill(193,251,232,200);
+      }
+      ellipseMode(CENTER);
+      ellipse(userPos.x, userPos.y, CIRCLE_RADIUS, CIRCLE_RADIUS);    
     }
-    ellipseMode(CENTER);
-    ellipse(currentCircleXY.x, currentCircleXY.y, CIRCLE_RADIUS, CIRCLE_RADIUS);    
   }
 }
 class Stretch {
