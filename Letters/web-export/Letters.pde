@@ -152,6 +152,9 @@ class Hint {
    
     if(pathLength >= 1){
       state++;
+      if(state+1 < l.points.length && l.points[state+1].newStroke){
+        state++;
+      }
       if(state == l.points.length-1){
         t = t.noDelay().setDuration(HOLD_TIME).play(); // hold shape
       }else if(state >= l.points.length){
@@ -171,6 +174,7 @@ class Hint {
     stroke(241,184,244,100);
     strokeWeight(1);
     
+    Vec2D intermediateTarget;
     beginShape();
     for(int i=0; i<l.points.length && i<=(state+1); i++){
       if(l.points[i].newStroke){
@@ -178,13 +182,20 @@ class Hint {
         beginShape();
       }
       if(i == state+1){
-        Vec2D intermediateTarget = l.points[i-1].pos.interpolateTo(l.points[i].pos, pathLength); 
+        intermediateTarget = l.points[i-1].pos.interpolateTo(l.points[i].pos, pathLength); 
         vertex(intermediateTarget.x, intermediateTarget.y);
       }else{
         vertex(l.points[i].x, l.points[i].y);
       }
     } 
     endShape();
+    
+    if(intermediateTarget != null){
+      noStroke();  
+      fill(193,251,232,200);
+      ellipseMode(CENTER);
+      ellipse(intermediateTarget.x, intermediateTarget.y, CIRCLE_RADIUS, CIRCLE_RADIUS);   
+    }
   }
 }
     //236  170  216  
