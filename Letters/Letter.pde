@@ -71,7 +71,7 @@ class Tracing {
   }
   
   void handleMouseReleased() {
-    if(tracing) {
+    if(!done() && tracing) {
       // reset to start of current path
       userPos = l.points[state].pos;
       tracing = false;
