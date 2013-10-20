@@ -21,10 +21,6 @@ class Vertex {
     this.y = y;
     this.newStroke = newStroke;
   }
-  
-  Vec2D screen() {
-    return new Vec2D(screenX(x, y), screenY(x, y));
-  }
 }
 
 class Letter {
@@ -40,6 +36,10 @@ class Letter {
     this.points = points;
   }
   
+  Vec2D currentCircle() {
+   return points[state];
+  } 
+  
   void drawIt() {
     noFill();
     shapeMode(CORNER);
@@ -54,12 +54,12 @@ class Letter {
       }
       vertex(points[i].x, points[i].y);
       if(i == state && drawNext){
-        currentCircleXY = points[i].screen();
+        currentCircleXY = points[i].pos;
         drawNext = false;
         
         if(i<points.length-1){
-          currentPath = new Line2D(points[i].screen(), points[i+1].screen());
-          target = points[i+1].screen();
+          currentPath = new Line2D(points[i].pos, points[i+1].pos);
+          target = points[i+1];
         }
       }
     } 
@@ -77,9 +77,9 @@ class Letter {
     towards the target
     */
     float speed = dist(mouseX, mouseY, pmouseX, pmouseY);
-    float delta = mouseXY.distanceTo(currentCircleXY);
+    float delta = stretch.mouse.distanceTo(currentCircle());
     boolean insideCircle = false;
-    if(delta <= CIRCLE_RADIUS*currentScale && mousePressed){
+    if(delta <= CIRCLE_RADIUS && mousePressed){
       insideCircle = true;
       requireMousePressedInCircleToContinue = false;
       if(speed > 1){
@@ -94,11 +94,11 @@ class Letter {
       }else{
         player.stop();
       }
-      Vec2D closestPoint = currentLetter.currentPath.closestPointTo(mouseXY);
-      float err = closestPoint.distanceTo(mouseXY);
-      if(err <= THRESHOLD*currentScale){
+      Vec2D closestPoint = currentLetter.currentPath.closestPointTo(stretch.mouse);
+      float err = closestPoint.distanceTo(stretch.mouse);
+      if(err <= THRESHOLD){
         // moving towards target? (IE this move makes them closer to the target)
-        if(mouseXY.distanceTo(target) < currentCircleXY.distanceTo(target)){
+        if(stretch.mouse.distanceTo(target) < currentCircleXY.distanceTo(target)){
           currentCircleXY = closestPoint; // always show circle on path
         }
       }
@@ -106,7 +106,7 @@ class Letter {
     
     /* have the reached the current target?
      or the final target for this letter? */
-    if(currentCircleXY.distanceTo(target) <= THRESHOLD*currentScale) {
+    if(currentCircleXY.distanceTo(target) <= THRESHOLD) {
       int nextState = state+1;
       if(nextState == points.length){
         done = true;
@@ -124,7 +124,6 @@ class Letter {
     }
 
     /* draw current circle */
-    //strokeWeight(currentScale);
     noStroke();  
     if(insideCircle){
       fill(236,170,216,200);
@@ -132,6 +131,6 @@ class Letter {
       fill(193,251,232,200);
     }
     ellipseMode(CENTER);
-    ellipse(currentCircleXY.x, currentCircleXY.y, CIRCLE_RADIUS*currentScale, CIRCLE_RADIUS*currentScale);    
+    ellipse(currentCircleXY.x, currentCircleXY.y, CIRCLE_RADIUS, CIRCLE_RADIUS);    
   }
 }

@@ -1,6 +1,7 @@
 Maxim maxim;
 AudioPlayer player;var Vec2D = toxi.geom.Vec2D,
-    Line2D = toxi.geom.Line2D;
+Line2D = toxi.geom.Line2D;    
+Stretch stretch;
 
 var LETTER_WIDTH = 20;
 var LETTER_HEIGHT = 25;
@@ -10,7 +11,7 @@ float THRESHOLD = 3;
 Letter[] letters, currentLetter;
 int currentLetterIndex = 0;
 float currentScale;
-Vec2D mouseXY;
+Vec2D mouseXY, mouseModelVec2D;
 boolean requireMousePressedInCircleToContinue = false;
 
 void setup() {
@@ -25,9 +26,13 @@ void setup() {
 
   createShapes();
   currentLetter = letters[currentLetterIndex];
+  
+  stretch = new Stretch(LETTER_WIDTH, LETTER_HEIGHT, 0.5);
 }
 
 void draw() {
+  stretch.update();
+  
   if(currentLetter.done && (currentLetterIndex+1) < letters.length){
     currentLetterIndex++;
     currentLetter = letters[currentLetterIndex];
@@ -35,26 +40,10 @@ void draw() {
     done = false;
   }
 
-  var newWidth = window.innerWidth;
-  var newHeight = int(window.innerHeight);
-  if(newWidth != width || newHeight != height){
-    size(newWidth, newHeight);
-  }  
-  mouseXY = new Vec2D(mouseX, mouseY);
-  currentScale = min(width/LETTER_WIDTH * 0.5, height/LETTER_HEIGHT * 0.5);
-
 //  background(232,35,176);
   background(255);
-  
-  pushMatrix();
-  translate(width/2, height/2);
-  scale(currentScale);
-  translate(-LETTER_WIDTH/2, -LETTER_HEIGHT/2);
-  
+    
   currentLetter.drawIt();
-  
-  popMatrix();
-
   currentLetter.trace();  
 }
 
