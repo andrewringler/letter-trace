@@ -218,11 +218,12 @@ class Tracing {
     
     if(tracing && userPos.distanceTo(target()) <= THRESHOLD) {
       // they have reached the current target, move on to the next path
-      state++;
-      if(state+1 < l.points.length && l.points[state+1].newStroke){
-        state++;
+      if(state+2 < l.points.length && l.points[state+2].newStroke){
+        state = state + 2;
+        tracing = false; // they must start the next path with a new touch
+      } else {
+        state = state + 1;
       }
-      tracing = false;
       if(!done()){
         userPos = l.points[state].pos;
         currentPath = new Line2D(userPos, l.points[state+1].pos);
