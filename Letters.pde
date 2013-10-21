@@ -264,7 +264,7 @@ class Tracing {
     if(!done() && !tracing){
       // maybe this is the start of a new trace
       float delta = stretch.mouse.distanceTo(userPos);
-      if(delta <= CIRCLE_RADIUS){
+      if(delta <= CIRCLE_RADIUS*20){
         tracing = true;
       }
     }
